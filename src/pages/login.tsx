@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/react';
+import { Button, Flex, Link } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import { useRouter } from 'next/router';
@@ -8,6 +8,7 @@ import Wrapper from '../components/Wrapper';
 import { useLoginMutation } from '../lib/graphql/generated/graphql';
 import createGraphQLClient from '../lib/graphql/utils/createGraphQLClient';
 import { toErrorMap } from '../utils/errorMap';
+import NextLink from 'next/link';
 
 interface LoginProps {}
 
@@ -17,7 +18,7 @@ const Login: React.FC<LoginProps> = () => {
 	return (
 		<Wrapper>
 			<Formik
-				initialValues={{ username: '', password: '' }}
+				initialValues={{ email: '', password: '' }}
 				onSubmit={async (values, { setErrors }) => {
 					const response = await login({ options: values });
 
@@ -30,8 +31,15 @@ const Login: React.FC<LoginProps> = () => {
 			>
 				{({ isSubmitting }) => (
 					<Form>
-						<InputField name='username' label='Username' />
+						<InputField name='email' label='Email' type='email' />
 						<InputField name='password' label='Password' type='password' />
+						<Flex>
+							<NextLink href='/forgot-password'>
+								<Link ml='auto' mt={2}>
+									Forgot password?
+								</Link>
+							</NextLink>
+						</Flex>
 						<Button
 							mt={8}
 							bgColor='teal'
