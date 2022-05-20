@@ -6,6 +6,7 @@ import {
 	useMeQuery,
 } from '../lib/graphql/generated/graphql';
 import { isServer } from '../utils/isServer';
+import { DarkModeSwitch } from './DarkModeSwitch';
 
 const Navbar: React.FC = () => {
 	const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
@@ -46,7 +47,10 @@ const Navbar: React.FC = () => {
 			<NextLink href='/'>
 				<Link mr={2}>home</Link>
 			</NextLink>
-			<Box ml={'auto'}>{fetching ? null : showUserOptions()}</Box>
+			<DarkModeSwitch />
+			<Box ml='auto' mr={20}>
+				{fetching ? null : showUserOptions()}
+			</Box>
 		</Flex>
 	);
 };
