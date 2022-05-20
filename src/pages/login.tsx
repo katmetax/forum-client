@@ -21,11 +21,13 @@ const Login: React.FC<LoginProps> = () => {
 				initialValues={{ email: '', password: '' }}
 				onSubmit={async (values, { setErrors }) => {
 					const response = await login({ options: values });
-
 					if (response.data?.login.errors) {
 						setErrors(toErrorMap(response.data.login.errors));
 					} else if (response.data?.login.user) {
-						router.push('/');
+						if (typeof router?.query?.next === 'string') {
+							return router.push(router.query.next);
+						}
+						return router.push('/');
 					}
 				}}
 			>

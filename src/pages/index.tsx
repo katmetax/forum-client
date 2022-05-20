@@ -1,5 +1,6 @@
-import { Text } from '@chakra-ui/react';
+import { Link } from '@chakra-ui/layout';
 import { withUrqlClient } from 'next-urql';
+import NextLink from 'next/link';
 import Navbar from '../components/Navbar';
 import { usePostsQuery } from '../lib/graphql/generated/graphql';
 import createGraphQLClient from '../lib/graphql/utils/createGraphQLClient';
@@ -13,7 +14,10 @@ const Index = () => {
 	return (
 		<>
 			<Navbar />
-			<Text>Hello World!</Text>
+			<NextLink href='create-post'>
+				<Link>Create Post</Link>
+			</NextLink>
+
 			{/* <DarkModeSwitch /> */}
 			{!data ? (
 				<div>loading...</div>

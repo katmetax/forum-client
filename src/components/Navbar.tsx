@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
 	};
 
 	return (
-		<Flex p={4} bg='lightgrey'>
+		<Flex p={4} bg='lightgrey' position='sticky' zIndex={1}>
 			<NextLink href='/'>
 				<Link mr={2}>home</Link>
 			</NextLink>
