@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import createGraphQLClient from '../lib/graphql/utils/createGraphQLClient';
 import theme from '../theme';
 
-function MyApp({ Component, pageProps }) {
+const MyApp = ({ Component, pageProps }) => {
 	return (
 		<ChakraProvider resetCSS theme={theme}>
 			<ColorModeProvider
@@ -17,6 +17,6 @@ function MyApp({ Component, pageProps }) {
 			</ColorModeProvider>
 		</ChakraProvider>
 	);
-}
+};
 
 export default withUrqlClient(createGraphQLClient, { ssr: true })(MyApp);

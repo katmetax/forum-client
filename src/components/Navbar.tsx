@@ -43,14 +43,24 @@ const Navbar: React.FC = () => {
 	};
 
 	return (
-		<Flex p={4} bg='lightgrey' position='sticky' zIndex={1}>
+		<Flex
+			p={4}
+			bg='lightgrey'
+			sx={{
+				position: '-webkit-sticky' /* Safari */,
+				position: 'sticky',
+				top: '0',
+			}}
+			zIndex={1}
+			w='100%'
+		>
 			<NextLink href='/'>
 				<Link mr={2}>home</Link>
 			</NextLink>
-			<DarkModeSwitch />
-			<Box ml='auto' mr={20}>
+			<Flex ml='auto' mr={20} flexDirection='column' wrap='wrap'>
 				{fetching ? null : showUserOptions()}
-			</Box>
+				<DarkModeSwitch />
+			</Flex>
 		</Flex>
 	);
 };
