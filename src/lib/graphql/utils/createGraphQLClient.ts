@@ -6,12 +6,11 @@ import {
 	LoginMutation,
 	RegisterMutation,
 } from '../generated/graphql';
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { cacheExchange, Cache, Resolver } from '@urql/exchange-graphcache';
 import { UpdateQueryWrapper } from './updateQueryWrapper';
 import Router from 'next/router';
 
 import { stringifyVariables } from '@urql/core';
-import { Resolver } from '../types';
 
 export type MergeMode = 'before' | 'after';
 
@@ -32,17 +31,14 @@ export const cursorPagination = (): Resolver => {
 		}
 		const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`;
 		const isItInTheCache = cache.resolve(
-			cache.resolveFieldByKey(entityKey, fieldKey) as string,
+			cache.resolve(entityKey, fieldKey) as string,
 			'posts'
 		);
 		info.partial = !isItInTheCache;
 		let hasMore = true;
 		const results: string[] = [];
 		fieldInfos.forEach((field) => {
-			const key = cache.resolveFieldByKey(
-				entityKey,
-				field.fieldKey
-			) as string[];
+			const key = cache.resolve(entityKey, field.fieldKey) as string[];
 			const data = cache.resolve(key, 'posts') as string[];
 			const _hasMore = cache.resolve(key, 'hasMore');
 			if (!_hasMore) {
@@ -59,6 +55,14 @@ export const cursorPagination = (): Resolver => {
 	};
 };
 
+const invalidateAllPosts = (cache: Cache) => {
+	const allFields = cache.inspectFields('Query');
+	const fieldInfos = allFields.filter((info) => info.fieldName === 'posts');
+	fieldInfos.forEach((fi) => {
+		cache.invalidate('Query', 'posts', fi.arguments || {});
+	});
+};
+
 const createGraphQLClient = (ssrExchange: any) => ({
 	url: 'http://localhost:4000/graphql',
 	fetchOptions: {
@@ -73,6 +77,9 @@ const createGraphQLClient = (ssrExchange: any) => ({
 			resolvers: { Query: { posts: cursorPagination() } },
 			updates: {
 				Mutation: {
+					createPost: (_result, args, cache) => {
+						invalidateAllPosts(cache);
+					},
 					logout: (_result, args, cache) => {
 						UpdateQueryWrapper<LogoutMutation, MeQuery>(
 							cache,
