@@ -1,10 +1,11 @@
-import { Box, Flex, Heading, Link, Text } from '@chakra-ui/layout';
-import { Button, Stack } from '@chakra-ui/react';
+import { Flex, Heading, Link, Text } from '@chakra-ui/layout';
+import { Alert, AlertIcon, Button, Spinner } from '@chakra-ui/react';
 import { withUrqlClient } from 'next-urql';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import ContentPosts from '../components/ContentPosts';
 import Wrapper from '../components/Wrapper';
-import { usePostsQuery } from '../lib/graphql/generated/graphql';
+import { Post, usePostsQuery } from '../lib/graphql/generated/graphql';
 import createGraphQLClient from '../lib/graphql/utils/createGraphQLClient';
 import { isServer } from '../utils/isServer';
 
@@ -13,10 +14,28 @@ const Index = () => {
 		limit: 10,
 		cursor: null as null | string,
 	});
-	const [{ data, fetching }] = usePostsQuery({
+	const [{ data, fetching, error }] = usePostsQuery({
 		variables,
 		pause: isServer(),
 	});
+
+	const renderStatusDiv = () => {
+		if (error) {
+			return (
+				<Alert status='error'>
+					<AlertIcon />
+					Uh oh something went wrong!
+				</Alert>
+			);
+		}
+		return (
+			<Flex justify='center' my={4}>
+				<Spinner />
+				<Text ml={4}>loading...</Text>
+			</Flex>
+		);
+	};
+
 	return (
 		<Wrapper>
 			<Flex align='center' my={4}>
@@ -26,18 +45,12 @@ const Index = () => {
 				</NextLink>
 			</Flex>
 			{fetching || !data ? (
-				<div>loading...</div>
+				renderStatusDiv()
 			) : (
-				<Stack spacing={8}>
-					{data.posts.posts.map(({ id, title, contentSnippet }) => (
-						<Box key={id} p={5} shadow='md' borderWidth='1px'>
-							<Heading fontSize='xl'>{title}</Heading>
-							<Text mt={4}>{contentSnippet}...</Text>
-						</Box>
-					))}
-				</Stack>
+				<ContentPosts
+					posts={data.posts.posts as Partial<Post>[]}
+				></ContentPosts>
 			)}
-
 			<Flex my={8}>
 				{data && data.posts.hasMore ? (
 					<Button

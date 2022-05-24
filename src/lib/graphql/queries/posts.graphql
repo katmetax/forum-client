@@ -8,6 +8,11 @@ query Posts ($limit: Int!, $cursor: String) {
       title
       content
       contentSnippet
+      points
+      creator {
+        id
+        username
+      }
     }
   }
 }
