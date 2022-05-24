@@ -11,7 +11,7 @@ const ContentPosts: React.FC<ContentPostsProps> = ({ posts }) => {
 	return (
 		<Stack spacing={8}>
 			{posts.map((post) => (
-				<ContentPost {...post}></ContentPost>
+				<ContentPost key={post.id} {...post}></ContentPost>
 			))}
 		</Stack>
 	);

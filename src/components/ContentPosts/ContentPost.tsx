@@ -1,6 +1,7 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/layout';
 import React from 'react';
 import { Post } from '../../lib/graphql/generated/graphql';
+import VoteSection from '../VoteSection';
 
 const ContentPost: React.FC<Partial<Post>> = ({
 	id,
@@ -18,9 +19,7 @@ const ContentPost: React.FC<Partial<Post>> = ({
 			direction='row'
 			wrap='wrap'
 		>
-			<Text p={4} align='center' verticalAlign='middle'>
-				{points}
-			</Text>
+			<VoteSection points={points!} postId={id!} />
 			<Box w='90%'>
 				<Heading fontSize='xl'>{title}</Heading>
 				<Text fontSize='sm'>posted by {creator!.username} </Text>
