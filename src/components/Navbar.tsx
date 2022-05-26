@@ -1,4 +1,4 @@
-import { Flex, Box, Link, Button } from '@chakra-ui/react';
+import { Flex, Box, Link, Button, Heading } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import React from 'react';
 import {
@@ -28,7 +28,12 @@ const Navbar: React.FC = () => {
 			);
 		}
 		return (
-			<Flex>
+			<Flex align='center'>
+				<NextLink href='create-post'>
+					<Button as={Link} mr={4} colorScheme='cyan'>
+						Create Post
+					</Button>
+				</NextLink>
 				<Box>{data.me.username}</Box>
 				<Button
 					ml={2}
@@ -45,7 +50,7 @@ const Navbar: React.FC = () => {
 	return (
 		<Flex
 			p={4}
-			bg='lightgrey'
+			bgColor='lightgray'
 			sx={{
 				position: '-webkit-sticky' /* Safari */,
 				position: 'sticky',
@@ -54,12 +59,16 @@ const Navbar: React.FC = () => {
 			zIndex={1}
 			w='100%'
 		>
-			<NextLink href='/'>
-				<Link mr={2}>home</Link>
-			</NextLink>
-			<Flex ml='auto' mr={20} flexDirection='column' wrap='wrap'>
-				{fetching ? null : showUserOptions()}
-				<DarkModeSwitch />
+			<Flex flex={1} m='auto' maxW={800} align='center'>
+				<NextLink href='/'>
+					<Link mr={2}>
+						<Heading>NewReddit</Heading>
+					</Link>
+				</NextLink>
+				<Flex ml='auto' flexDirection='row' align='center'>
+					{fetching ? null : showUserOptions()}
+					<DarkModeSwitch />
+				</Flex>
 			</Flex>
 		</Flex>
 	);

@@ -1,16 +1,20 @@
-import { Box, Flex, Heading, Text } from '@chakra-ui/layout';
+import { Box, Flex, Heading, Link, Text } from '@chakra-ui/layout';
 import React from 'react';
 import { Post } from '../../lib/graphql/generated/graphql';
 import VoteSection from '../VoteSection';
+import NextLink from 'next/link';
 
-const ContentPost: React.FC<Partial<Post>> = ({
+type ContentPostProps = Partial<Post> & { withLink?: boolean };
+
+const ContentPost: React.FC<ContentPostProps> = ({
 	id,
 	points,
 	title,
 	creator,
-	contentSnippet,
+	content,
 	voteStatus,
-}: Partial<Post>) => {
+	withLink,
+}: ContentPostProps) => {
 	return (
 		<Flex
 			key={id}
@@ -22,9 +26,17 @@ const ContentPost: React.FC<Partial<Post>> = ({
 		>
 			<VoteSection points={points!} postId={id!} voteStatus={voteStatus} />
 			<Box w='90%'>
-				<Heading fontSize='xl'>{title}</Heading>
+				{withLink ? (
+					<Link>
+						<NextLink href='/post/[id]' as={`/post/${id}`}>
+							<Heading fontSize='xl'>{title}</Heading>
+						</NextLink>
+					</Link>
+				) : (
+					<Heading fontSize='xl'>{title}</Heading>
+				)}
 				<Text fontSize='sm'>posted by {creator!.username} </Text>
-				<Text mt={4}>{contentSnippet}...</Text>
+				<Text mt={4}>{content}</Text>
 			</Box>
 		</Flex>
 	);

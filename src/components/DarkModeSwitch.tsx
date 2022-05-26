@@ -5,8 +5,8 @@ export const DarkModeSwitch = () => {
 	const isDark = colorMode === 'dark';
 	return (
 		<Switch
-			flexBasis='50%'
-			ml={10}
+			flexBasis='10%'
+			ml={5}
 			color='green'
 			isChecked={isDark}
 			onChange={toggleColorMode}

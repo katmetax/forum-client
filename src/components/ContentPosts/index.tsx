@@ -11,7 +11,12 @@ const ContentPosts: React.FC<ContentPostsProps> = ({ posts }) => {
 	return (
 		<Stack spacing={8}>
 			{posts.map((post) => (
-				<ContentPost key={post.id} {...post}></ContentPost>
+				<ContentPost
+					key={post.id}
+					content={post.content || post.contentSnippet}
+					{...post}
+					withLink
+				></ContentPost>
 			))}
 		</Stack>
 	);

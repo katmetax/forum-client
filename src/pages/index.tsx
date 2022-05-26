@@ -39,12 +39,6 @@ const Index = () => {
 
 	return (
 		<Wrapper>
-			<Flex align='center' my={4}>
-				<Heading>New Reddit</Heading>
-				<NextLink href='create-post'>
-					<Link ml='auto'>Create Post</Link>
-				</NextLink>
-			</Flex>
 			{fetching || !data ? (
 				renderStatusDiv()
 			) : (
