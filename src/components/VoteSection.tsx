@@ -7,9 +7,14 @@ import { useVoteMutation } from '../lib/graphql/generated/graphql';
 interface VoteSectionProps {
 	points: number;
 	postId: number;
+	voteStatus?: number | null;
 }
 
-const VoteSection: React.FC<VoteSectionProps> = ({ points, postId }) => {
+const VoteSection: React.FC<VoteSectionProps> = ({
+	points,
+	postId,
+	voteStatus,
+}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [, vote] = useVoteMutation();
 	const voting = {
@@ -30,8 +35,9 @@ const VoteSection: React.FC<VoteSectionProps> = ({ points, postId }) => {
 			) : (
 				<>
 					<IconButton
-						colorScheme='cyan'
+						colorScheme={voteStatus === voting.upvote ? 'green' : 'blue'}
 						variant='outline'
+						isDisabled={voteStatus === voting.upvote}
 						aria-label='Upvote post'
 						onClick={async () =>
 							await buttonClickHandler(postId, voting.upvote)
@@ -42,8 +48,9 @@ const VoteSection: React.FC<VoteSectionProps> = ({ points, postId }) => {
 						{points}
 					</Text>
 					<IconButton
-						colorScheme='cyan'
+						colorScheme={voteStatus === voting.downvote ? 'red' : 'blue'}
 						variant='outline'
+						isDisabled={voteStatus === voting.downvote}
 						aria-label='Downvote post'
 						onClick={async () =>
 							await buttonClickHandler(postId, voting.downvote)

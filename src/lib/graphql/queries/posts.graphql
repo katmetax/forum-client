@@ -9,6 +9,7 @@ query Posts ($limit: Int!, $cursor: String) {
       content
       contentSnippet
       points
+      voteStatus
       creator {
         id
         username

@@ -21,6 +21,7 @@ const Index = () => {
 
 	const renderStatusDiv = () => {
 		if (error) {
+			console.error(error);
 			return (
 				<Alert status='error'>
 					<AlertIcon />

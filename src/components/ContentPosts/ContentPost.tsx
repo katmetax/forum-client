@@ -9,6 +9,7 @@ const ContentPost: React.FC<Partial<Post>> = ({
 	title,
 	creator,
 	contentSnippet,
+	voteStatus,
 }: Partial<Post>) => {
 	return (
 		<Flex
@@ -19,7 +20,7 @@ const ContentPost: React.FC<Partial<Post>> = ({
 			direction='row'
 			wrap='wrap'
 		>
-			<VoteSection points={points!} postId={id!} />
+			<VoteSection points={points!} postId={id!} voteStatus={voteStatus} />
 			<Box w='90%'>
 				<Heading fontSize='xl'>{title}</Heading>
 				<Text fontSize='sm'>posted by {creator!.username} </Text>

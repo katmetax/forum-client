@@ -5,12 +5,15 @@ import {
 	MeDocument,
 	LoginMutation,
 	RegisterMutation,
+	VoteMutationVariables,
 } from '../generated/graphql';
 import { cacheExchange, Cache, Resolver } from '@urql/exchange-graphcache';
 import { UpdateQueryWrapper } from './updateQueryWrapper';
 import Router from 'next/router';
-
+import { gql } from '@urql/core';
 import { stringifyVariables } from '@urql/core';
+import { isServer } from '../../../utils/isServer';
+import { NextUrqlClientConfig } from 'next-urql/dist/types/types';
 
 export type MergeMode = 'before' | 'after';
 
@@ -63,72 +66,113 @@ const invalidateAllPosts = (cache: Cache) => {
 	});
 };
 
-const createGraphQLClient = (ssrExchange: any) => ({
-	url: 'http://localhost:4000/graphql',
-	fetchOptions: {
-		credentials: 'include' as const,
-	},
-	exchanges: [
-		dedupExchange,
-		cacheExchange({
-			keys: {
-				PaginatedPosts: () => null,
+const createGraphQLClient: NextUrqlClientConfig = (
+	ssrExchange: any,
+	ctx: any
+) => {
+	let cookie = '';
+	if (isServer()) {
+		cookie = ctx?.req.headers.cookie;
+	}
+
+	return {
+		url: 'http://localhost:4000/graphql',
+		fetchOptions: {
+			credentials: 'include' as const,
+			headers: {
+				cookie: cookie,
 			},
-			resolvers: { Query: { posts: cursorPagination() } },
-			updates: {
-				Mutation: {
-					createPost: (_result, args, cache) => {
-						invalidateAllPosts(cache);
-					},
-					logout: (_result, args, cache) => {
-						UpdateQueryWrapper<LogoutMutation, MeQuery>(
-							cache,
-							{ query: MeDocument },
-							_result,
-							() => ({
-								me: null,
-							})
-						);
-					},
-					login: (_result, args, cache) => {
-						UpdateQueryWrapper<LoginMutation, MeQuery>(
-							cache,
-							{ query: MeDocument },
-							_result,
-							(result, query) => {
-								if (result.login.errors) {
-									return query;
+		},
+		exchanges: [
+			dedupExchange,
+			cacheExchange({
+				keys: {
+					PaginatedPosts: () => null,
+				},
+				resolvers: { Query: { posts: cursorPagination() } },
+				updates: {
+					Mutation: {
+						vote: (_result, args, cache) => {
+							const { postId, value } = args as VoteMutationVariables;
+							const data = cache.readFragment(
+								gql`
+									fragment _ on Post {
+										id
+										points
+									}
+								`,
+								{ id: postId }
+							);
+							if (data) {
+								if (data.voteStatus === value) {
+									return;
 								}
-								return { me: result.login.user };
+								const updatedPoints =
+									data.points + (!data.voteStatus ? 1 : 2) * value;
+								cache.writeFragment(
+									gql`
+										fragment __ on Post {
+											points
+											voteStatus
+										}
+									`,
+									{ id: postId, points: updatedPoints, voteStatus: value }
+								);
 							}
-						);
-					},
-					register: (_result, args, cache) => {
-						UpdateQueryWrapper<RegisterMutation, MeQuery>(
-							cache,
-							{ query: MeDocument },
-							_result,
-							(result, query) => {
-								if (result.register.errors) {
-									return query;
+						},
+						createPost: (_result, args, cache) => {
+							invalidateAllPosts(cache);
+						},
+						logout: (_result, args, cache) => {
+							UpdateQueryWrapper<LogoutMutation, MeQuery>(
+								cache,
+								{ query: MeDocument },
+								_result,
+								() => ({
+									me: null,
+								})
+							);
+						},
+						login: (_result, args, cache) => {
+							UpdateQueryWrapper<LoginMutation, MeQuery>(
+								cache,
+								{ query: MeDocument },
+								_result,
+								(result, query) => {
+									if (result.login.errors) {
+										return query;
+									}
+									return { me: result.login.user };
 								}
-								return { me: result.register.user };
-							}
-						);
+							);
+						},
+						register: (_result, args, cache) => {
+							UpdateQueryWrapper<RegisterMutation, MeQuery>(
+								cache,
+								{ query: MeDocument },
+								_result,
+								(result, query) => {
+									if (result.register.errors) {
+										return query;
+									}
+									return { me: result.register.user };
+								}
+							);
+						},
 					},
 				},
-			},
-		}),
-		ssrExchange,
-		errorExchange({
-			onError(error) {
-				if (error?.message.includes('not authenticated')) {
-					Router.replace('/login');
-				}
-			},
-		}),
-		fetchExchange,
-	],
-});
+			}),
+			ssrExchange,
+			errorExchange({
+				onError(error) {
+					if (error?.message.includes('not authenticated')) {
+						Router.replace('/login');
+					}
+				},
+			}),
+			fetchExchange,
+		],
+	};
+};
 
 export default createGraphQLClient;
