@@ -6,6 +6,7 @@ import {
 	LoginMutation,
 	RegisterMutation,
 	VoteMutationVariables,
+	DeletePostMutationVariables,
 } from '../generated/graphql';
 import { cacheExchange, Cache, Resolver } from '@urql/exchange-graphcache';
 import { UpdateQueryWrapper } from './updateQueryWrapper';
@@ -92,6 +93,12 @@ const createGraphQLClient: NextUrqlClientConfig = (
 				resolvers: { Query: { posts: cursorPagination() } },
 				updates: {
 					Mutation: {
+						deletePost: (_result, args, cache) => {
+							cache.invalidate({
+								__typename: 'Post',
+								id: (args as DeletePostMutationVariables).id,
+							});
+						},
 						vote: (_result, args, cache) => {
 							const { postId, value } = args as VoteMutationVariables;
 							const data = cache.readFragment(
