@@ -154,6 +154,7 @@ const createGraphQLClient: NextUrqlClientConfig = (
 									return { me: result.login.user };
 								}
 							);
+							invalidateAllPosts(cache);
 						},
 						register: (_result, args, cache) => {
 							UpdateQueryWrapper<RegisterMutation, MeQuery>(
