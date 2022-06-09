@@ -106,6 +106,7 @@ const createGraphQLClient: NextUrqlClientConfig = (
 									fragment _ on Post {
 										id
 										points
+										voteStatus
 									}
 								`,
 								{ id: postId }
@@ -114,6 +115,7 @@ const createGraphQLClient: NextUrqlClientConfig = (
 								if (data.voteStatus === value) {
 									return;
 								}
+								console.log(data);
 								const updatedPoints =
 									data.points + (!data.voteStatus ? 1 : 2) * value;
 								cache.writeFragment(

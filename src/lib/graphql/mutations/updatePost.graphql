@@ -1,0 +1,10 @@
+mutation UpdatePost($title: String!, $content: String!, $id: Float!) {
+  updatePost(id: $id, title: $title, content: $content) {
+    id
+    createdAt
+    updatedAt
+    title
+    content
+    contentSnippet
+  }
+}
